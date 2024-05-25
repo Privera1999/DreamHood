@@ -7,7 +7,7 @@ import java.sql.DriverManager
 import java.sql.SQLException
 
 class ConnectSql {
-    private val ip = "79.117.17.46:60078"
+    private val ip = "192.168.1.5:60078"
     private val db = "mejora_tu_barrio"
     private val username = "pablo"
     private val password = "1234567890q"

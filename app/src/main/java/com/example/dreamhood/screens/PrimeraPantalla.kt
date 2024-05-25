@@ -49,22 +49,12 @@ import java.sql.Types
 
 
 
-@RequiresApi(Build.VERSION_CODES.O)
+
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun primeraPantlla(navController: NavController){
-    val context = LocalContext.current
-    //SessionManager.clearSession(context)
     Scaffold {
-        val (username, password) = SessionManager.getSession(context)
-        if (username != null && password != null) {
-            navController.navigate(route = AppScreens.feed.route)
-        }
-        else{
             login(navController)
-        }
-
-
     }
 }
 

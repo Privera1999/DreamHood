@@ -61,6 +61,7 @@ import java.sql.PreparedStatement
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun SubirPublicacion(navController: NavController){
+
     Scaffold {
         formulariopublicacion(navController)
     }

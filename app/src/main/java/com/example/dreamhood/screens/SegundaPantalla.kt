@@ -65,7 +65,7 @@ import com.example.dreamhood.navegacion.AppScreens
 import java.io.ByteArrayOutputStream
 import java.io.InputStream
 import java.sql.PreparedStatement
-import com.example.dreamhood.screens.MensajeError
+import java.sql.ResultSet
 
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
@@ -82,12 +82,12 @@ fun registrarse(navController: NavController? = null, context: Context) {
     var pass by remember { mutableStateOf("") }
     var nombre by remember { mutableStateOf("") }
     var confirmarcon by remember { mutableStateOf("") }
-    var barrio by remember { mutableStateOf("") }
     var pdfFileUri by remember { mutableStateOf<Uri?>(null) }
     var showErrorDialog by remember { mutableStateOf(false) }
     var mensaje by remember { mutableStateOf("") }
     var TituloFlotante by remember { mutableStateOf("") }
-    var foto by remember { mutableStateOf(null) }
+    var idBarrio by remember { mutableStateOf(3) }
+    var BarrioSeleccionado by remember { mutableStateOf("") }
 
     val launcher = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri ->
         pdfFileUri = uri
@@ -172,7 +172,7 @@ fun registrarse(navController: NavController? = null, context: Context) {
 
         Spacer(modifier = Modifier.height(15.dp))
 
-        val selectedBarrio = SeleccionaBarrio()
+        BarrioSeleccionado = SeleccionaBarrio()
 
         Row(
             modifier = Modifier.padding(top = 16.dp)
@@ -222,8 +222,9 @@ fun registrarse(navController: NavController? = null, context: Context) {
                         }
 
                         else -> {
+                            idBarrio = ObtenerBarrioId(BarrioSeleccionado)
                             // Registrar el usuario si todas las validaciones pasan
-                            registrarUsuario(context, email, pass, nombre, selectedBarrio, pdfFileUri)
+                            registrarUsuario(context, email, pass, nombre, idBarrio, pdfFileUri)
 
                             TituloFlotante = "Confirmación"
                             mensaje = "Usuario Registrado Correctamente."
@@ -263,17 +264,17 @@ fun obtenerDatosArchivoPDF(context: Context, uri: Uri): ByteArray? {
 }
 
 
-fun registrarUsuario(context: Context, email: String, pass: String, nombre: String, barrio: String, pdfFileUri: Uri?) {
+fun registrarUsuario(context: Context, email: String, pass: String, nombre: String, barrio: Int, pdfFileUri: Uri?) {
     var connectSql = ConnectSql()
 
-    var a =  getImageByteArray(context,R.drawable.logodm)
+    var fotoDefault =  getImageByteArray(context,R.drawable.logodm)
 
     try {
         val addUsuario: PreparedStatement = connectSql.dbConn()?.prepareStatement("INSERT INTO usuarios (nombre, correo, contrasena, barrio_id, archivo_pdf, avatar, verificado) VALUES (?,?,?,?,?,?,?)")!!
         addUsuario.setString(1, nombre)
         addUsuario.setString(2, email)
         addUsuario.setString(3, pass)
-        addUsuario.setInt(4, 3)
+        addUsuario.setInt(4, barrio)
 
         // Convertir pdfFileUri de Uri? a ByteArray?
         val pdfData = pdfFileUri?.let { uri ->
@@ -285,7 +286,7 @@ fun registrarUsuario(context: Context, email: String, pass: String, nombre: Stri
             addUsuario.setBytes(5, it)
         } ?: addUsuario.setNull(5, Types.VARBINARY)
 
-        addUsuario.setBytes(6, a)
+        addUsuario.setBytes(6, fotoDefault)
         addUsuario.setBoolean(7, true)
         addUsuario.executeUpdate()
 
@@ -391,6 +392,31 @@ fun obtenerCorreos(): List<String>{
 fun VerificarCorreo(correo: String,Correos : List<String>):Boolean{
 return !Correos.contains(correo)
 }
+
+fun ObtenerBarrioId(barrio: String): Int {
+    var idBarrio: Int = 0
+    val connectSql = ConnectSql()
+    println("Datos de sesión obtenidos: Barrio=$barrio")
+
+    try {
+        val statement: PreparedStatement = connectSql.dbConn()?.prepareStatement("SELECT id FROM barrios WHERE nombre = ?")!!
+        statement.setString(1, barrio)
+        val resultSet: ResultSet = statement.executeQuery()
+
+        if (resultSet.next()) {
+            idBarrio = resultSet.getInt("id")
+        }
+    } catch (ex: Exception) {
+        ex.printStackTrace()
+    } finally {
+        connectSql.close()
+    }
+
+    println("Datos de sesión obtenidos: idBarrio=$idBarrio")
+    return idBarrio
+}
+
+
 
 
 

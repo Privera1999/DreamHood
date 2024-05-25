@@ -56,9 +56,11 @@ import java.sql.ResultSet
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun feed(navController: NavController){
+
     Scaffold {
         NavAbajo(navController)
         PhotoGrid()
+
     }
 }
 
@@ -86,7 +88,7 @@ fun NavAbajo(navController: NavController) {
                                 1 -> navController.navigate(route = AppScreens.SubirPublicacion.route)
                                 3 -> navController.navigate(route = AppScreens.Perfil.route)
                             }
-                                  },
+                        },
                         alwaysShowLabel = true
                     )
                 }
@@ -107,17 +109,17 @@ fun PhotoGrid() {
 
 
 
-    LazyVerticalGrid(
-        columns = GridCells.Fixed(1),
-        contentPadding = PaddingValues(vertical = 10.dp),
-        modifier = Modifier.padding(60.dp)
+        LazyVerticalGrid(
+            columns = GridCells.Fixed(1),
+            contentPadding = PaddingValues(vertical = 10.dp),
+            modifier = Modifier.padding(60.dp)
 
 
-    ) {
-        items(items) { item ->
-            PhotoCard(item)
+        ) {
+            items(items) { item ->
+                PhotoCard(item)
+            }
         }
-    }
     }
 }
 
@@ -170,7 +172,7 @@ fun PhotoCard(lista: ListaFeed) {
                 .fillMaxWidth()
                 .padding(top = 8.dp),
 
-        ) {
+            ) {
 
             if(lista.esVotacion){
                 Icon(
@@ -372,10 +374,10 @@ fun megusta (id : Int, mas : Boolean){
         annadirmegusta.executeUpdate()
 
     }else{
-            val annadirmegusta: PreparedStatement = connectSql.dbConn()?.prepareStatement("UPDATE incidentes SET me_gusta = me_gusta -1 WHERE id = ?")!!
-            annadirmegusta.setInt(1,id)
-            annadirmegusta.executeUpdate()
+        val annadirmegusta: PreparedStatement = connectSql.dbConn()?.prepareStatement("UPDATE incidentes SET me_gusta = me_gusta -1 WHERE id = ?")!!
+        annadirmegusta.setInt(1,id)
+        annadirmegusta.executeUpdate()
 
     }
-        connectSql.close()
+    connectSql.close()
 }

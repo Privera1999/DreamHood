@@ -19,6 +19,8 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.requiredHeight
+import androidx.compose.foundation.layout.requiredWidth
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.grid.GridCells
@@ -45,8 +47,10 @@ import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.example.compose.primaryLight
+import com.example.dreamhood.R
 import com.example.dreamhood.navegacion.AppScreens
 import com.example.dreamhood.navegacion.SessionManager
 import java.sql.PreparedStatement
@@ -59,7 +63,7 @@ fun feed(navController: NavController){
 
     Scaffold {
         NavAbajo(navController)
-        PhotoGrid()
+        PhotoGrid(navController)
 
     }
 }
@@ -99,8 +103,8 @@ fun NavAbajo(navController: NavController) {
 }
 
 @Composable
-fun PhotoGrid() {
-
+fun PhotoGrid(navController: NavController) {
+    logoArriba()
     val items = sacarfeed(context = LocalContext.current)
 
     if(items.isEmpty()){
@@ -117,14 +121,14 @@ fun PhotoGrid() {
 
         ) {
             items(items) { item ->
-                PhotoCard(item)
+                PhotoCard(item,navController)
             }
         }
     }
 }
 
 @Composable
-fun PhotoCard(lista: ListaFeed) {
+fun PhotoCard(lista: ListaFeed, navController : NavController) {
 
     var isFavorite by remember { mutableStateOf(false) }
     var Afavor by remember { mutableStateOf(false) }
@@ -174,7 +178,7 @@ fun PhotoCard(lista: ListaFeed) {
 
             ) {
 
-            if(lista.esVotacion){
+            if(!lista.esVotacion){
                 Icon(
                     imageVector = if (isFavorite) Icons.Filled.Favorite else Icons.Outlined.FavoriteBorder,
                     contentDescription = "Favoritos",
@@ -183,11 +187,10 @@ fun PhotoCard(lista: ListaFeed) {
                         .clickable {
                             isFavorite = !isFavorite
 
-                            if(isFavorite) {
+                            if (isFavorite) {
                                 megusta(lista.id, true)
                                 lista.meGusta++
-                            }
-                            else {
+                            } else {
                                 megusta(lista.id, false)
                                 lista.meGusta--
                             }
@@ -236,7 +239,11 @@ fun PhotoCard(lista: ListaFeed) {
             Icon(
                 imageVector = Icons.Outlined.Email,
                 contentDescription = "Comentar",
-                modifier = Modifier.size(24.dp),
+                modifier = Modifier.size(24.dp)
+                    .clickable{
+                        navController.navigate("comentarios/${lista.id}")
+
+                    },
                 tint = Color.Black
             )
         }
@@ -268,8 +275,6 @@ fun sacarfeed(context: Context): List<ListaFeed> {
 
     try {
         val (username, password, barrioId) = SessionManager.getSession(context)
-
-
         if (barrioId != null) {
             val consulta: PreparedStatement = connectSql.dbConn()?.prepareStatement(
                 """
@@ -288,6 +293,7 @@ fun sacarfeed(context: Context): List<ListaFeed> {
                 JOIN 
                     usuarios u ON i.usuario_id = u.id
                 WHERE i.barrio_id = ?
+                ORDER BY i.id desc
                 """.trimIndent()
             )!!
 
@@ -320,51 +326,6 @@ fun sacarfeed(context: Context): List<ListaFeed> {
     return usuarios
 }
 
-
-
-
-
-
-
-@Composable
-fun ImagenDesdeBytes(bytes: ByteArray?,avatar: Boolean){
-    if (bytes == null) {
-        // Si los bytes son nulos, no hay imagen para mostrar
-        return
-    }
-
-    val bitmap = remember {
-        BitmapFactory.decodeByteArray(bytes, 0, bytes.size)
-    }
-
-    if (bitmap != null) {
-        if(!avatar){
-            Image(
-                bitmap = bitmap.asImageBitmap(),
-                contentDescription = null,
-                contentScale = ContentScale.Crop,
-                modifier = Modifier
-                    .height(200.dp)
-                    .padding(top = 5.dp)
-            )
-        }
-        else{
-            Image(
-                bitmap = bitmap.asImageBitmap(),
-                contentDescription = null,
-                contentScale = ContentScale.Crop,
-                modifier = Modifier
-                    .height(40.dp)
-                    .width(40.dp)
-                    .clip(CircleShape)
-                    .border(2.dp, Color.Gray, CircleShape)
-
-            )
-        }
-
-    }
-}
-
 fun megusta (id : Int, mas : Boolean){
     var connectSql = ConnectSql()
 
@@ -381,3 +342,4 @@ fun megusta (id : Int, mas : Boolean){
     }
     connectSql.close()
 }
+

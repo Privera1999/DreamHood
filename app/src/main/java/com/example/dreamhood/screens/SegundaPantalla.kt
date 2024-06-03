@@ -231,7 +231,6 @@ fun registrarse(navController: NavController? = null, context: Context) {
                             showErrorDialog = true
 
                             if(showErrorDialog){
-                                // Navegar a otra pantalla después de registrar el usuario
                                 navController?.navigate(AppScreens.PrimeraPantalla.route)
                             }
 
@@ -414,15 +413,4 @@ fun ObtenerBarrioId(barrio: String): Int {
 
     println("Datos de sesión obtenidos: idBarrio=$idBarrio")
     return idBarrio
-}
-
-
-
-
-
-
-@Preview
-@Composable
-fun PreviewRegistrarse() {
-    registrarse(context = LocalContext.current)
 }

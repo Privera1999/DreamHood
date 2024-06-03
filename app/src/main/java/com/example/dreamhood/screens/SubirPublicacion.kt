@@ -53,9 +53,12 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.example.dreamhood.navegacion.AppScreens
+import com.example.dreamhood.navegacion.SessionManager
 import java.io.ByteArrayOutputStream
 import java.io.InputStream
 import java.sql.PreparedStatement
+import java.sql.SQLException
 
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
@@ -63,6 +66,7 @@ import java.sql.PreparedStatement
 fun SubirPublicacion(navController: NavController){
 
     Scaffold {
+        NavAbajo(navController)
         formulariopublicacion(navController)
     }
 
@@ -70,6 +74,7 @@ fun SubirPublicacion(navController: NavController){
 
 @Composable
 fun formulariopublicacion(navController: NavController? = null) {
+    logoArriba()
     var titulo by remember { mutableStateOf("") }
     var descripcion by remember { mutableStateOf("") }
     var votacion by remember { mutableStateOf(false) }
@@ -127,9 +132,9 @@ fun formulariopublicacion(navController: NavController? = null) {
         Spacer(modifier = Modifier.height(15.dp))
 
         Row(){
-           foto = PhotoPicker()
+            foto = PhotoPicker(false)
             Spacer(modifier = Modifier.width(20.dp))
-            botonSubir(titulo,descripcion,votacion,foto)
+            botonSubir(titulo,descripcion,votacion,foto,navController)
         }
 
         }
@@ -137,72 +142,7 @@ fun formulariopublicacion(navController: NavController? = null) {
 
 
 
-@Composable
-fun PhotoPicker() : ByteArray? {
-    var selectedImageUri by remember { mutableStateOf<Uri?>(null) }
-    var imageBytes by remember { mutableStateOf<ByteArray?>(null) }
-    val context = LocalContext.current
 
-    val launcher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.GetContent(),
-        onResult = { uri: Uri? ->
-            selectedImageUri = uri
-            imageBytes = uri?.let { uriToByteArray(context, it) }
-        }
-    )
-
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center,
-    ) {
-        Box(
-            modifier = Modifier
-                .size(50.dp)
-                .clip(CircleShape)
-                .background(Color(0xFF196B52))
-                .clickable { launcher.launch("image/*") },
-            contentAlignment = Alignment.Center
-        ) {
-
-                Icon(
-                    imageVector = Icons.Filled.AddCircle,
-                    contentDescription = "Seleccionar Foto",
-                    modifier = Modifier.size(30.dp)
-                )
-            }
-
-    }
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-    if (selectedImageUri != null) {
-        val inputStream: InputStream? = context.contentResolver.openInputStream(selectedImageUri!!)
-        val bitmap = BitmapFactory.decodeStream(inputStream)
-        Image(
-            bitmap = bitmap.asImageBitmap(),
-            contentDescription = null,
-            contentScale = ContentScale.Inside,
-            modifier = Modifier.height(200.dp)
-                .padding(top = 50.dp)
-
-        )
-    }
-
-    return imageBytes
-      }
-
-
-fun uriToByteArray(context: Context, uri: Uri): ByteArray? {
-    return context.contentResolver.openInputStream(uri)?.use { inputStream ->
-        val buffer = ByteArrayOutputStream()
-        val byteArray = ByteArray(1024)
-        var len: Int
-        while (inputStream.read(byteArray).also { len = it } != -1) {
-            buffer.write(byteArray, 0, len)
-        }
-        buffer.toByteArray()
-    }
-}
 
 @Composable
 fun EsVotacion():Boolean{
@@ -249,38 +189,67 @@ fun EsVotacion():Boolean{
     }
 
 @Composable
-fun botonSubir(titulo: String,descipcion: String,votacion : Boolean,foto : ByteArray?){
+fun botonSubir(
+    titulo: String,
+    descripcion: String,
+    votacion: Boolean,
+    foto: ByteArray?,
+    navController: NavController? = null
+) {
+    val context = LocalContext.current
 
-    Column(
-    ) {
+    Column {
         Box(
             modifier = Modifier
                 .size(50.dp)
                 .clip(CircleShape)
                 .background(Color(0xFF196B52))
-                .clickable { insertPublicacion(titulo,descipcion,votacion,foto) },
+                .clickable {
+                    when {
+                        titulo.isBlank() -> {
+                            showToast(context, "Error: El título no puede estar vacío.")
+                        }
+                        descripcion.isBlank() -> {
+                            showToast(context, "Error: La descripción no puede estar vacía.")
+                        }
+                        foto == null -> {
+                            showToast(context, "Error: No ha subido ninguna foto.")
+                        }
+                        votacion == null -> {
+                            showToast(context, "Error: Debe seleccionar la opción de votación.")
+                        }
+                        else -> {
+                            insertPublicacion(titulo, descripcion, votacion, foto, context)
+                            navController?.navigate(AppScreens.feed.route)
+                            showToast(context, "Publicación Subida Correctamente.")
+                        }
+                    }
+                },
             contentAlignment = Alignment.Center
         ) {
-
             Icon(
                 imageVector = Icons.Filled.Done,
-                contentDescription = "Seleccionar Foto",
+                contentDescription = "Subir",
                 modifier = Modifier.size(30.dp)
             )
-            }
-            }
         }
+    }
+}
 
 
-fun insertPublicacion(titulo: String, descripcion: String, es_votacion: Boolean, imagen: ByteArray?) {
+fun insertPublicacion(titulo: String, descripcion: String, es_votacion: Boolean, imagen: ByteArray?, context: Context) {
     var connectSql = ConnectSql()
+    val (username, password, barrioId) = SessionManager.getSession(context)
+    val usuarioid= obtenerIDUsuario(username)
 
     try {
         val addPublicacion: PreparedStatement = connectSql.dbConn()?.prepareStatement("INSERT INTO incidentes (titulo, descripcion, usuario_id, barrio_id, es_votacion, imagen) VALUES (?,?,?,?,?,?)")!!
         addPublicacion.setString(1, titulo)
         addPublicacion.setString(2, descripcion)
-        addPublicacion.setInt(3, 1)
-        addPublicacion.setInt(4, 3)
+        addPublicacion.setInt(3, usuarioid)
+        if (barrioId != null) {
+            addPublicacion.setInt(4, barrioId)
+        }
         addPublicacion.setBoolean(5, es_votacion)
         addPublicacion.setBytes(6, imagen)
         addPublicacion.executeUpdate()
@@ -289,6 +258,27 @@ fun insertPublicacion(titulo: String, descripcion: String, es_votacion: Boolean,
     }finally {
         connectSql.close()
     }
+}
+
+
+fun obtenerIDUsuario(correo : String?): Int{
+    var usuarioId: Int = 0
+    val connectSql = ConnectSql()
+
+    try {
+        val statement: PreparedStatement = connectSql.dbConn()?.prepareStatement("SELECT id FROM usuarios WHERE correo = ?")!!
+        statement.setString(1, correo)
+        val resultSet = statement.executeQuery()
+        if (resultSet.next()) {
+            usuarioId = resultSet.getInt("id")
+        }
+    } catch (ex: SQLException) {
+        ex.printStackTrace()
+    }finally {
+        connectSql.close()
+    }
+    return usuarioId
+
 }
 
 

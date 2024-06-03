@@ -4,10 +4,12 @@ import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.example.dreamhood.screens.LaPrimera
+import androidx.navigation.navArgument
+import com.example.dreamhood.screens.Comentarios
 import com.example.dreamhood.screens.Perfil
 import com.example.dreamhood.screens.SegundaPantalla
 import com.example.dreamhood.screens.SubirPublicacion
@@ -40,8 +42,12 @@ fun AppNavigation() {
             composable(route = AppScreens.Perfil.route) {
                 Perfil(navController)
             }
-            composable(route = AppScreens.LaPrimera.route) {
-                LaPrimera(navController)
+            composable(
+                route = AppScreens.Comentarios.route,
+                arguments = listOf(navArgument("comentarioId") { type = NavType.IntType })
+            ) { backStackEntry ->
+                val comentarioId = backStackEntry.arguments?.getInt("comentarioId")
+                Comentarios(navController, comentarioId)
             }
 
 
@@ -67,11 +73,14 @@ fun AppNavigation() {
             composable(route = AppScreens.Perfil.route) {
                 Perfil(navController)
             }
-            composable(route = AppScreens.LaPrimera.route) {
-                LaPrimera(navController)
+            composable(
+                route = AppScreens.Comentarios.route,
+                arguments = listOf(navArgument("comentarioId") { type = NavType.IntType })
+            ) { backStackEntry ->
+                val comentarioId = backStackEntry.arguments?.getInt("comentarioId")
+                Comentarios(navController, comentarioId)
             }
         }
-
     }
 }
 

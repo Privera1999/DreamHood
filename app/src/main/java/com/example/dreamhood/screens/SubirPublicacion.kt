@@ -55,6 +55,8 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.dreamhood.navegacion.AppScreens
 import com.example.dreamhood.navegacion.SessionManager
+import com.google.firebase.messaging.FirebaseMessaging
+import com.google.firebase.messaging.RemoteMessage
 import java.io.ByteArrayOutputStream
 import java.io.InputStream
 import java.sql.PreparedStatement
@@ -64,9 +66,11 @@ import java.sql.SQLException
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun SubirPublicacion(navController: NavController){
-
-    Scaffold {
-        NavAbajo(navController)
+    Scaffold(
+        bottomBar = {
+            NavAbajo(navController = navController)
+        }
+    ){
         formulariopublicacion(navController)
     }
 
@@ -280,5 +284,6 @@ fun obtenerIDUsuario(correo : String?): Int{
     return usuarioId
 
 }
+
 
 

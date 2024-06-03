@@ -60,47 +60,46 @@ import java.sql.ResultSet
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun feed(navController: NavController){
-
-    Scaffold {
-        NavAbajo(navController)
+    Scaffold(
+        bottomBar = {
+            NavAbajo(navController = navController)
+        }
+    ){
         PhotoGrid(navController)
-
     }
-}
+    }
 
-@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
+
 @Composable
 fun NavAbajo(navController: NavController) {
     var selectedItem by remember { mutableStateOf(0) }
     val items = listOf("Home", "Añadir", "Buscar", "Perfil")
     val icons = listOf(Icons.Filled.Home, Icons.Filled.Add, Icons.Filled.Search, Icons.Filled.Person)
 
-    Scaffold(
-        bottomBar = {
-            BottomNavigation(
-                backgroundColor = primaryLight,
-                contentColor = Color.White
-            ) {
-                items.forEachIndexed { index, item ->
-                    BottomNavigationItem(
-                        icon = { Icon(icons[index], contentDescription = item) },
-                        label = { Text(item) },
-                        selected = selectedItem == index,
-                        onClick = { selectedItem = index
-                            when (index) {
-                                0 -> navController.navigate(route = AppScreens.feed.route)
-                                1 -> navController.navigate(route = AppScreens.SubirPublicacion.route)
-                                3 -> navController.navigate(route = AppScreens.Perfil.route)
-                            }
-                        },
-                        alwaysShowLabel = true
-                    )
-                }
-            }
-        }
+    BottomNavigation(
+        backgroundColor = primaryLight,
+        contentColor = Color.White,
+        modifier = Modifier.fillMaxWidth()
     ) {
+        items.forEachIndexed { index, item ->
+            BottomNavigationItem(
+                icon = { Icon(icons[index], contentDescription = item) },
+                label = { Text(item) },
+                selected = selectedItem == index,
+                onClick = {
+                    selectedItem = index
+                    when (index) {
+                        0 -> navController.navigate(route = AppScreens.feed.route)
+                        1 -> navController.navigate(route = AppScreens.SubirPublicacion.route)
+                        3 -> navController.navigate(route = AppScreens.Perfil.route)
+                    }
+                },
+                alwaysShowLabel = true
+            )
+        }
     }
 }
+
 
 @Composable
 fun PhotoGrid(navController: NavController) {

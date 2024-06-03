@@ -60,24 +60,27 @@ import androidx.navigation.NavController
 import com.example.compose.primaryLight
 import com.example.dreamhood.navegacion.AppScreens
 import com.example.dreamhood.navegacion.SessionManager
+import kotlinx.coroutines.launch
 import java.sql.PreparedStatement
 import java.sql.ResultSet
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun Perfil(navController: NavController){
-    Scaffold {
-        NavAbajo(navController)
+    Scaffold(
+        bottomBar = {
+            NavAbajo(navController = navController)
+        }
+    ){
         formularioPerfil(navController)
-
     }
 }
 
 data class ListaUsuario(
-    val id : Int,
+    val id: Int,
     val nombre: String,
     val correo: String,
-    val contrasenna: String,
+    val contrasena: String,
     var barrio_id: Int,
     var archivo_pdf: ByteArray,
     var avatar: ByteArray?,
@@ -95,6 +98,8 @@ fun formularioPerfil(navController: NavController) {
     var pdfFileUri by remember { mutableStateOf<Uri?>(null) }
     var foto by remember { mutableStateOf<ByteArray?>(null) }
     var datosUsuario by remember { mutableStateOf<ListaUsuario?>(null) }
+    var originalDatosUsuario by remember { mutableStateOf<ListaUsuario?>(null) } // Estado original
+
     val launcher = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri ->
         pdfFileUri = uri
     }
@@ -102,10 +107,9 @@ fun formularioPerfil(navController: NavController) {
     val snackbarHostState = remember { SnackbarHostState() }
     val coroutineScope = rememberCoroutineScope()
 
-
     // Obtener los datos del usuario
     datosUsuario = sacarDatos(context)
-
+    originalDatosUsuario = datosUsuario?.copy() // Guardar una copia de los datos originales
 
     Column(
         modifier = Modifier
@@ -113,15 +117,11 @@ fun formularioPerfil(navController: NavController) {
             .padding(top = 90.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-
         datosUsuario?.let { usuario ->
             // Mostrar la imagen del avatar
             ImagenDesdeBytesPerfil(usuario.avatar)
-
             Spacer(modifier = Modifier.height(15.dp))
-
             foto = PhotoPicker(true)
-
         }
 
         TextField(
@@ -146,13 +146,9 @@ fun formularioPerfil(navController: NavController) {
             leadingIcon = { Icon(Icons.Filled.Lock, contentDescription = null) }
         )
 
-
         Spacer(modifier = Modifier.height(15.dp))
-
         SeleccionaBarrio()
-
         Spacer(modifier = Modifier.height(15.dp))
-
 
         Button(
             onClick = { launcher.launch("application/pdf") },
@@ -162,31 +158,94 @@ fun formularioPerfil(navController: NavController) {
 
         Spacer(modifier = Modifier.height(15.dp))
 
-        Row(){
+        Row {
             Button(
-                onClick = {  },
+                onClick = {
+                    coroutineScope.launch {
+                        guardarCambios(context, datosUsuario, originalDatosUsuario, nuevapass, confirmarpass, pdfFileUri, foto)
+                    }
+                },
             ) {
                 Text("Guardar Cambios", Modifier.padding(start = 8.dp))
             }
 
             Button(
-                onClick = { SessionManager.clearSession(context)
+                onClick = {
+                    SessionManager.clearSession(context)
                     navController?.navigate(AppScreens.PrimeraPantalla.route)
-                          },
+                },
                 modifier = Modifier.padding(start = 10.dp),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = Color.Red
-                )
+                colors = ButtonDefaults.buttonColors(containerColor = Color.Red)
             ) {
                 Text("Cerrar Sesión", Modifier.padding(start = 8.dp))
             }
         }
-
-
-
     }
 }
 
+suspend fun guardarCambios(
+    context: Context,
+    datosUsuario: ListaUsuario?,
+    originalDatosUsuario: ListaUsuario?,
+    nuevapass: String,
+    confirmarpass: String,
+    pdfFileUri: Uri?,
+    foto: ByteArray?
+) {
+    if (datosUsuario == null || originalDatosUsuario == null) return
+
+    val connectSql = ConnectSql()
+    try {
+        val consulta: PreparedStatement = connectSql.dbConn()?.prepareStatement(
+            "UPDATE usuarios SET nombre = ?, contrasena = ?, barrio_id = ?, archivo_pdf = ?, avatar = ? WHERE id = ?"
+        )!!
+
+        var cambios = false
+
+        consulta.setString(1, datosUsuario.nombre) // Seteamos el nombre del usuario
+
+        if (nuevapass.isNotEmpty() && nuevapass == confirmarpass && nuevapass != originalDatosUsuario.contrasena) {
+            consulta.setString(2, nuevapass)
+            cambios = true
+        } else {
+            consulta.setString(2, originalDatosUsuario.contrasena)
+        }
+
+        if (datosUsuario.barrio_id != originalDatosUsuario.barrio_id) {
+            consulta.setInt(3, datosUsuario.barrio_id)
+            cambios = true
+        } else {
+            consulta.setInt(3, originalDatosUsuario.barrio_id)
+        }
+
+        if (pdfFileUri != null) {
+            val inputStream = context.contentResolver.openInputStream(pdfFileUri)
+            val pdfBytes = inputStream?.readBytes()
+            consulta.setBytes(4, pdfBytes)
+            cambios = true
+        } else {
+            consulta.setBytes(4, originalDatosUsuario.archivo_pdf)
+        }
+
+        if (foto != null && !foto.contentEquals(originalDatosUsuario.avatar)) {
+            consulta.setBytes(5, foto)
+            cambios = true
+        } else {
+            consulta.setBytes(5, originalDatosUsuario.avatar)
+        }
+
+        consulta.setInt(6, datosUsuario.id)
+
+        if (cambios) {
+            consulta.executeUpdate()
+        }
+
+    } catch (ex: Exception) {
+        Log.e("Error en guardarCambios: ", ex.message!!)
+    } finally {
+        connectSql.close()
+    }
+}
 
 fun sacarDatos(context: Context): ListaUsuario? {
     val connectSql = ConnectSql()

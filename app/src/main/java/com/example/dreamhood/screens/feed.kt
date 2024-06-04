@@ -91,6 +91,7 @@ fun NavAbajo(navController: NavController) {
                     when (index) {
                         0 -> navController.navigate(route = AppScreens.feed.route)
                         1 -> navController.navigate(route = AppScreens.SubirPublicacion.route)
+                        2 -> navController.navigate(route = AppScreens.Mapas.route)
                         3 -> navController.navigate(route = AppScreens.Perfil.route)
                     }
                 },

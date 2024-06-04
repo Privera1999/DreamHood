@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
@@ -20,6 +21,7 @@ import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.BottomNavigation
 import androidx.compose.material.BottomNavigationItem
+import androidx.compose.material.RadioButton
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Home
@@ -98,7 +100,8 @@ fun formularioPerfil(navController: NavController) {
     var pdfFileUri by remember { mutableStateOf<Uri?>(null) }
     var foto by remember { mutableStateOf<ByteArray?>(null) }
     var datosUsuario by remember { mutableStateOf<ListaUsuario?>(null) }
-    var originalDatosUsuario by remember { mutableStateOf<ListaUsuario?>(null) } // Estado original
+    var originalDatosUsuario by remember { mutableStateOf<ListaUsuario?>(null) }
+    var TraspasoBarrio by remember { mutableStateOf(false) }
 
     val launcher = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri ->
         pdfFileUri = uri
@@ -147,14 +150,21 @@ fun formularioPerfil(navController: NavController) {
         )
 
         Spacer(modifier = Modifier.height(15.dp))
-        SeleccionaBarrio()
-        Spacer(modifier = Modifier.height(15.dp))
 
-        Button(
-            onClick = { launcher.launch("application/pdf") },
-        ) {
-            Text("Adjuntar Cert.", Modifier.padding(start = 8.dp))
+        TraspasoBarrio = TraspasoDeBarrio()
+
+        if(TraspasoBarrio){
+            SeleccionaBarrio()
+            Spacer(modifier = Modifier.height(15.dp))
+
+            Button(
+                onClick = { launcher.launch("application/pdf") },
+            ) {
+                Text("Adjuntar Cert.", Modifier.padding(start = 8.dp))
+            }
         }
+
+
 
         Spacer(modifier = Modifier.height(15.dp))
 
@@ -163,6 +173,7 @@ fun formularioPerfil(navController: NavController) {
                 onClick = {
                     coroutineScope.launch {
                         guardarCambios(context, datosUsuario, originalDatosUsuario, nuevapass, confirmarpass, pdfFileUri, foto)
+                        showToast(context,"Cambios Guardados Correctamente.")
                     }
                 },
             ) {
@@ -278,4 +289,50 @@ fun sacarDatos(context: Context): ListaUsuario? {
     }
 
     return null
+}
+
+
+@Composable
+fun TraspasoDeBarrio():Boolean{
+    var OpcionSeleccionada by remember { mutableStateOf<String?>(null) }
+
+    Column(
+        Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 70.dp),
+        horizontalAlignment = Alignment.Start
+    ) {
+        Text(text = "¿Te has mudado de barrio Sí o No?")
+
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.padding(vertical = 4.dp)
+        ) {
+            RadioButton(
+                selected = OpcionSeleccionada == "Sí",
+                onClick = { OpcionSeleccionada = "Sí" }
+            )
+            Text(text = "Sí")
+        }
+
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.padding(vertical = 4.dp)
+        ) {
+            RadioButton(
+                selected = OpcionSeleccionada == "No",
+                onClick = { OpcionSeleccionada = "No" }
+            )
+            Text(text = "No")
+        }
+        Spacer(modifier = Modifier.height(16.dp))
+    }
+
+    if(OpcionSeleccionada=="Sí"){
+        return true
+    }else{
+        return false
+    }
+
+
 }

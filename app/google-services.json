@@ -1,0 +1,30 @@
+{
+  "project_info": {
+    "project_number": "35725290224",
+    "firebase_url": "https://dreamhood-40c9c-default-rtdb.europe-west1.firebasedatabase.app",
+    "project_id": "dreamhood-40c9c",
+    "storage_bucket": "dreamhood-40c9c.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:35725290224:android:c884ae72503f6a2503f035",
+        "android_client_info": {
+          "package_name": "com.example.dreamhood"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCVOHtSwWRVZxqwk6HuwNdtrq23VwW4IWg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

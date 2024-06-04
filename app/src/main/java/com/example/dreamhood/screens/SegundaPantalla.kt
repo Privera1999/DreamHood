@@ -194,9 +194,9 @@ fun registrarse(navController: NavController? = null, context: Context) {
                             mensaje = "El nombre y apellidos no pueden estar vacíos."
                             showErrorDialog = true
                         }
-                        !email.contains("@") -> {
+                        !isValidEmail(email) -> {
                             TituloFlotante = "Error"
-                            mensaje = "El correo electrónico debe contener un '@'."
+                            mensaje = "El correo electrónico no tiene una estructura válida."
                             showErrorDialog = true
                         }
                         pass.length < 8 -> {
@@ -215,7 +215,7 @@ fun registrarse(navController: NavController? = null, context: Context) {
                             showErrorDialog = true
                         }
 
-                        VerificarCorreo(email, obtenerCorreos()) == false ->{
+                        VerificarCorreo(email, obtenerCorreos()) == false -> {
                             TituloFlotante = "Error"
                             mensaje = "Correo Electronico ya registrado."
                             showErrorDialog = true
@@ -230,11 +230,9 @@ fun registrarse(navController: NavController? = null, context: Context) {
                             mensaje = "Usuario Registrado Correctamente."
                             showErrorDialog = true
 
-                            if(showErrorDialog){
+                            if (showErrorDialog) {
                                 navController?.navigate(AppScreens.PrimeraPantalla.route)
                             }
-
-
                         }
                     }
                 },
@@ -247,6 +245,11 @@ fun registrarse(navController: NavController? = null, context: Context) {
     }
 }
 
+// Función para validar la estructura del correo electrónico
+fun isValidEmail(email: String): Boolean {
+    val emailPattern = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$"
+    return email.matches(emailPattern.toRegex())
+}
 fun obtenerDatosArchivoPDF(context: Context, uri: Uri): ByteArray? {
     val contentResolver: ContentResolver = context.contentResolver
     val inputStream: InputStream? = contentResolver.openInputStream(uri)

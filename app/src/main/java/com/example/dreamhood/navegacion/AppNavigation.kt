@@ -15,6 +15,7 @@ import com.example.dreamhood.screens.SegundaPantalla
 import com.example.dreamhood.screens.SubirPublicacion
 import com.example.dreamhood.screens.feed
 import com.example.dreamhood.screens.primeraPantlla
+import mapas
 
 
 @RequiresApi(Build.VERSION_CODES.O)
@@ -41,6 +42,9 @@ fun AppNavigation() {
             }
             composable(route = AppScreens.Perfil.route) {
                 Perfil(navController)
+            }
+            composable(route = AppScreens.Mapas.route) {
+                mapas(navController)
             }
             composable(
                 route = AppScreens.Comentarios.route,
@@ -72,6 +76,9 @@ fun AppNavigation() {
             }
             composable(route = AppScreens.Perfil.route) {
                 Perfil(navController)
+            }
+            composable(route = AppScreens.Mapas.route) {
+                mapas(navController)
             }
             composable(
                 route = AppScreens.Comentarios.route,

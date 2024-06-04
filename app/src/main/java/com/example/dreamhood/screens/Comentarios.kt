@@ -6,6 +6,7 @@ import android.graphics.BitmapFactory
 import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -22,6 +23,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.example.compose.primaryLight
 import com.example.dreamhood.navegacion.SessionManager
 import java.sql.PreparedStatement
 import java.sql.ResultSet
@@ -71,9 +73,9 @@ fun ComentariosScreen(navController: NavController, idPublicacion: Int?, context
                 bitmap = bitmap.asImageBitmap(),
                 contentDescription = "Imagen de la Publicación",
                 modifier = Modifier
-                    .fillMaxWidth()
+                    .align(Alignment.CenterHorizontally)
                     .height(200.dp)
-                    .background(Color.Gray)
+                    .border(2.dp,primaryLight)
             )
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -105,8 +107,8 @@ fun ComentariosScreen(navController: NavController, idPublicacion: Int?, context
                     if (usuarioID != null) {
                         añadirComentario(idPublicacion, usuarioID, nuevoComentario.text)
                     }
-                    nuevoComentario = TextFieldValue("") // Clear the text field
-                    comentarios = obtenerComentarios(idPublicacion) // Refresh comments
+                    nuevoComentario = TextFieldValue("")
+                    comentarios = obtenerComentarios(idPublicacion)
                 }
             },
             modifier = Modifier.fillMaxWidth()
@@ -114,7 +116,7 @@ fun ComentariosScreen(navController: NavController, idPublicacion: Int?, context
             Text("Añadir Comentario")
         }
 
-        Spacer(modifier = Modifier.height(56.dp)) // Deja espacio para la barra de navegación
+        Spacer(modifier = Modifier.height(56.dp))
     }
 }
 
@@ -144,12 +146,11 @@ fun ComentarioItem(comentario: Comentario) {
             Text(
                 text = nombreUsuario,
                 fontSize = 14.sp,
-                modifier = Modifier.padding(top = 5.dp)
+                modifier = Modifier.padding(top = 1.dp)
             )
             Text(
                 text = comentario.texto,
                 fontSize = 12.sp,
-                modifier = Modifier.padding(top = 2.dp)
             )
         }
     }

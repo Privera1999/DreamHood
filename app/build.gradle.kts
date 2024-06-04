@@ -80,6 +80,10 @@ dependencies {
     annotationProcessor ("com.github.bumptech.glide:compiler:4.12.0")
     implementation(platform("com.google.firebase:firebase-bom:32.2.2"))
     implementation("com.google.firebase:firebase-messaging-ktx")
+    implementation ("com.google.android.gms:play-services-maps:18.0.2")
+    implementation ("com.google.maps.android:maps-compose:2.2.0")
+
+
 
 
 

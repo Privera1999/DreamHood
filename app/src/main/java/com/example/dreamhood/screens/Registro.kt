@@ -54,7 +54,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import java.sql.Types
 
@@ -75,7 +74,7 @@ fun SegundaPantalla(navController: NavController) {
         registrarse(navController = navController, context = LocalContext.current)
     }
 }
-
+//Función que contiene todo el diseño de la pagina.
 @Composable
 fun registrarse(navController: NavController? = null, context: Context) {
     var email by remember { mutableStateOf("") }
@@ -250,6 +249,7 @@ fun isValidEmail(email: String): Boolean {
     val emailPattern = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$"
     return email.matches(emailPattern.toRegex())
 }
+//Función para obtener los datos del pdf seleccionado por el usuario.
 fun obtenerDatosArchivoPDF(context: Context, uri: Uri): ByteArray? {
     val contentResolver: ContentResolver = context.contentResolver
     val inputStream: InputStream? = contentResolver.openInputStream(uri)
@@ -265,7 +265,7 @@ fun obtenerDatosArchivoPDF(context: Context, uri: Uri): ByteArray? {
     }
 }
 
-
+//Función para registrar al usuario en la BBDD
 fun registrarUsuario(context: Context, email: String, pass: String, nombre: String, barrio: Int, pdfFileUri: Uri?) {
     var connectSql = ConnectSql()
 
@@ -299,6 +299,7 @@ fun registrarUsuario(context: Context, email: String, pass: String, nombre: Stri
     }
 }
 
+//Función que contiene el diseño y la logica de seleccionar un barrio u otro
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SeleccionaBarrio(): String {
@@ -339,6 +340,7 @@ fun SeleccionaBarrio(): String {
     return selectedBarrio
 }
 
+//Función para obtener los barrios desde la BBDD
 fun obtenerBarriosDesdeBD(): List<String> {
     val barrios = mutableListOf<String>()
     val connectSql = ConnectSql()
@@ -358,21 +360,25 @@ fun obtenerBarriosDesdeBD(): List<String> {
     return barrios
 }
 
+//Función para obtener el bitmap del pdf
 fun getBitmapFromResource(context: Context, resId: Int): Bitmap {
     return BitmapFactory.decodeResource(context.resources, R.drawable.logodm)
 }
 
+//Función para pasar el bitmap a array
 fun bitmapToByteArray(bitmap: Bitmap): ByteArray {
     val stream = ByteArrayOutputStream()
     bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream)
     return stream.toByteArray()
 }
 
+//Función para obtener una iamgen desde un array de bytes
 fun getImageByteArray(context: Context, resId: Int): ByteArray {
     val bitmap = getBitmapFromResource(context, resId)
     return bitmapToByteArray(bitmap)
 }
 
+//Función para obtener los correos electronicos ya registrados.
 fun obtenerCorreos(): List<String>{
     val Correos = mutableListOf<String>()
     val connectSql = ConnectSql()
@@ -391,10 +397,12 @@ fun obtenerCorreos(): List<String>{
 
     return Correos
 }
+//Función para verificar si el correo ya existe.
 fun VerificarCorreo(correo: String,Correos : List<String>):Boolean{
 return !Correos.contains(correo)
 }
 
+//Función para para obtener el id del barrio.
 fun ObtenerBarrioId(barrio: String): Int {
     var idBarrio: Int = 0
     val connectSql = ConnectSql()

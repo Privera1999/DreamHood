@@ -69,7 +69,7 @@ fun feed(navController: NavController){
     }
     }
 
-
+//Barra de navegación y su logica para redirigir a las pantalals correspondientes.
 @Composable
 fun NavAbajo(navController: NavController) {
     var selectedItem by remember { mutableStateOf(0) }
@@ -101,6 +101,7 @@ fun NavAbajo(navController: NavController) {
     }
 }
 
+//Obtener los items de la feed y meterlos en un LazyVerticalGrid
 
 @Composable
 fun PhotoGrid(navController: NavController) {
@@ -108,17 +109,11 @@ fun PhotoGrid(navController: NavController) {
     val items = sacarfeed(context = LocalContext.current)
 
     if(items.isEmpty()){
-
     }else{
-
-
-
         LazyVerticalGrid(
             columns = GridCells.Fixed(1),
             contentPadding = PaddingValues(vertical = 10.dp),
             modifier = Modifier.padding(60.dp)
-
-
         ) {
             items(items) { item ->
                 PhotoCard(item,navController)
@@ -127,6 +122,7 @@ fun PhotoGrid(navController: NavController) {
     }
 }
 
+//Cada uno de los objetos del LazyVerticalGrid para que se vea la imagen el icono del usuario el comentario los me gustas o las votaciones
 @Composable
 fun PhotoCard(lista: ListaFeed, navController : NavController) {
 
@@ -148,15 +144,12 @@ fun PhotoCard(lista: ListaFeed, navController : NavController) {
     val scalea by animateFloatAsState(
         targetValue = if (Afavor) 1f else 1f
     )
-
     Column(
         modifier = Modifier
             .padding(top = 10.dp)
             .border(2.dp, Color.Gray, RectangleShape)
             .padding(15.dp)
             .fillMaxWidth()
-
-
     ) {
         Row(
         ){
@@ -257,6 +250,7 @@ fun PhotoCard(lista: ListaFeed, navController : NavController) {
 
 }
 
+//DataClass para la Feed
 data class ListaFeed(
     val id : Int,
     val titulo: String,
@@ -269,6 +263,7 @@ data class ListaFeed(
     val nombreusuario: String
 )
 
+//Función para sacar de la BBDD los datos de la feed
 fun sacarfeed(context: Context): List<ListaFeed> {
     val usuarios: MutableList<ListaFeed> = mutableListOf()
     val connectSql = ConnectSql()
@@ -326,6 +321,7 @@ fun sacarfeed(context: Context): List<ListaFeed> {
     return usuarios
 }
 
+//Función para manejar los me gustas y las votaciones y actualizarlos en la BBDD
 fun megusta (id : Int, mas : Boolean){
     var connectSql = ConnectSql()
 

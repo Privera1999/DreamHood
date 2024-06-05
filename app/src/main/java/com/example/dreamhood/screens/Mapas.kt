@@ -50,9 +50,10 @@ fun mapas(navController: NavController){
 }
 
 val Cordoba = LatLng(37.887620, -4.779756)
-
+//Data Class para los marcadores del mapa
 data class MarcadoresLista(val id: Int,val latitud: Double,val longitud: Double,val descripcion: String, val imagen: ByteArray)
 
+//Función para crear un mapa usando la api de google maps
 @Composable
 fun MyMap(navController: NavController) {
 
@@ -65,7 +66,7 @@ fun MyMap(navController: NavController) {
             cameraPositionState = cameraPositionState, navController =  navController)
     }
 }
-
+//Función para modificar los marcadores del mapa
 @Composable
 fun GoogleMapView(
     modifier: Modifier = Modifier,
@@ -108,7 +109,7 @@ fun GoogleMapView(
        }
     }
 
-
+//Función para obtener los marcadores del mapa y su respectiva información
 fun sacarmapa(context: Context): List<MarcadoresLista> {
     val marcadores: MutableList<MarcadoresLista> = mutableListOf()
     val connectSql = ConnectSql()
@@ -156,6 +157,7 @@ fun sacarmapa(context: Context): List<MarcadoresLista> {
     return marcadores
 }
 
+//Función para redirigir a los comentarios de la publicación seleccionada.
 fun irAcomentarios(navController: NavController,id : Int){
     navController.navigate("comentarios/${id}")
 }

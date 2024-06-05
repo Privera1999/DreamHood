@@ -78,6 +78,7 @@ fun Perfil(navController: NavController){
     }
 }
 
+//Data class para los usuarios
 data class ListaUsuario(
     val id: Int,
     val nombre: String,
@@ -90,7 +91,7 @@ data class ListaUsuario(
 
 
 
-
+//Función que contiene todo lo visual de la pagina de perfil
 @Composable
 fun formularioPerfil(navController: NavController) {
     logoArriba()
@@ -163,11 +164,7 @@ fun formularioPerfil(navController: NavController) {
                 Text("Adjuntar Cert.", Modifier.padding(start = 8.dp))
             }
         }
-
-
-
         Spacer(modifier = Modifier.height(15.dp))
-
         Row {
             Button(
                 onClick = {
@@ -179,7 +176,6 @@ fun formularioPerfil(navController: NavController) {
             ) {
                 Text("Guardar Cambios", Modifier.padding(start = 8.dp))
             }
-
             Button(
                 onClick = {
                     SessionManager.clearSession(context)
@@ -194,6 +190,7 @@ fun formularioPerfil(navController: NavController) {
     }
 }
 
+//Función para guardar los cambios obtenidos del usuario
 suspend fun guardarCambios(
     context: Context,
     datosUsuario: ListaUsuario?,
@@ -258,6 +255,7 @@ suspend fun guardarCambios(
     }
 }
 
+//Función para sacar los datos del usuario
 fun sacarDatos(context: Context): ListaUsuario? {
     val connectSql = ConnectSql()
     try {
@@ -291,7 +289,7 @@ fun sacarDatos(context: Context): ListaUsuario? {
     return null
 }
 
-
+//Función para traspasar de barrio al usuario
 @Composable
 fun TraspasoDeBarrio():Boolean{
     var OpcionSeleccionada by remember { mutableStateOf<String?>(null) }

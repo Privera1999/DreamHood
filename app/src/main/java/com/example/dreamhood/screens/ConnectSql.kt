@@ -6,6 +6,7 @@ import java.sql.Connection
 import java.sql.DriverManager
 import java.sql.SQLException
 
+//Funcion basica para conectarte a la base de datos
 class ConnectSql {
     private val ip = "188.26.207.200:60078"
     private val db = "mejora_tu_barrio"

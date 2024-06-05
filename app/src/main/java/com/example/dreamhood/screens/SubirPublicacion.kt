@@ -66,6 +66,7 @@ fun SubirPublicacion(navController: NavController){
 
 }
 
+//Función que contiene todo el diseño de la pagina.
 @Composable
 fun formulariopublicacion(navController: NavController? = null) {
     logoArriba()
@@ -76,9 +77,6 @@ fun formulariopublicacion(navController: NavController? = null) {
     var latitud by remember { mutableStateOf("") }
     var longitud by remember { mutableStateOf("") }
     var MapaMostrado by remember { mutableStateOf(false) }
-
-
-
 
     Column(
         modifier = Modifier
@@ -98,10 +96,7 @@ fun formulariopublicacion(navController: NavController? = null) {
             label = { Text("Título") },
             leadingIcon = { Icon(Icons.Filled.Info, contentDescription = null) }
         )
-
         Spacer(modifier = Modifier.height(15.dp))
-
-
             TextField(
                 value = descripcion,
                 onValueChange = { descripcion = it },
@@ -123,11 +118,7 @@ fun formulariopublicacion(navController: NavController? = null) {
                 )
 
         Spacer(modifier = Modifier.height(15.dp))
-
         votacion = EsVotacion()
-
-
-
 
         Button(onClick = { MapaMostrado = true }) {
             Text("Seleccionar Ubicación")
@@ -142,22 +133,16 @@ fun formulariopublicacion(navController: NavController? = null) {
                 }
             )
         }
-
         Spacer(modifier = Modifier.height(15.dp))
-
         Row(){
             foto = PhotoPicker(false)
             Spacer(modifier = Modifier.width(20.dp))
             botonSubir(titulo,descripcion,votacion,foto,latitud,longitud,navController)
-        }
-
+         }
         }
     }
 
-
-
-
-
+//Función para saber si es una votación o no
 @Composable
 fun EsVotacion():Boolean{
     var OpcionSeleccionada by remember { mutableStateOf<String?>(null) }
@@ -201,6 +186,8 @@ fun EsVotacion():Boolean{
 
 
     }
+
+//Función que maneja toda la logica a la hora de subir la publicación.
 
 @Composable
 fun botonSubir(
@@ -252,7 +239,7 @@ fun botonSubir(
     }
 }
 
-
+//Función para subir a la bbdd la publicación.
 fun insertPublicacion(titulo: String, descripcion: String, es_votacion: Boolean, imagen: ByteArray?,latitud: String,longitud: String, context: Context) {
     var connectSql = ConnectSql()
     val (username, password, barrioId) = SessionManager.getSession(context)
@@ -278,7 +265,7 @@ fun insertPublicacion(titulo: String, descripcion: String, es_votacion: Boolean,
     }
 }
 
-
+//Función para obtener el ID del usuario.
 fun obtenerIDUsuario(correo : String?): Int{
     var usuarioId: Int = 0
     val connectSql = ConnectSql()
@@ -299,6 +286,7 @@ fun obtenerIDUsuario(correo : String?): Int{
 
 }
 
+//Función para incrustar un mapa usando la api de google maps
 @Composable
 fun MapScreen(onLocationSelected: (Double, Double) -> Unit) {
     val context = LocalContext.current

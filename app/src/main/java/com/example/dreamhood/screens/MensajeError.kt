@@ -14,22 +14,8 @@ import androidx.compose.runtime.setValue
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
-@Composable
-fun MensajeError(texto : String){
 
-    var showErrorDialog by remember { mutableStateOf(false) }
-    AlertDialog(
-        onDismissRequest = { showErrorDialog = false },
-        confirmButton = {
-            Button(onClick = { showErrorDialog = false }) {
-                Text("Aceptar")
-            }
-        },
-        title = { Text("Error") },
-        text = { Text(texto) }
-    )
-}
-
+//Función para mostrar un mensaje emergente
 fun showToast(context: Context, message: String) {
     Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
 }

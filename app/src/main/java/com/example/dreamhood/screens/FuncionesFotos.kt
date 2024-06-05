@@ -42,6 +42,7 @@ import com.example.dreamhood.R
 import java.io.ByteArrayOutputStream
 import java.io.InputStream
 
+//Funcion para pasar de Byte a una imagen
 @Composable
 fun ImagenDesdeBytes(bytes: ByteArray?,avatar: Boolean){
     if (bytes == null) {
@@ -81,6 +82,7 @@ fun ImagenDesdeBytes(bytes: ByteArray?,avatar: Boolean){
     }
 }
 
+//Función para obtener una imagen de perfil desde Bytes
 @Composable
 fun ImagenDesdeBytesPerfil(bytes: ByteArray?){
     if (bytes == null) {
@@ -104,7 +106,7 @@ fun ImagenDesdeBytesPerfil(bytes: ByteArray?){
             )
         }
 
-
+//Función que se utilzia para el diseño de las fotos de perfil
 @Composable
 fun PhotoPicker(perfil : Boolean) : ByteArray? {
     var selectedImageUri by remember { mutableStateOf<Uri?>(null) }
@@ -157,12 +159,10 @@ fun PhotoPicker(perfil : Boolean) : ByteArray? {
             )
         }
     }
-
-
-
     return imageBytes
 }
 
+//Función para pasar de formato Uri a Bytes
 
 fun uriToByteArray(context: Context, uri: Uri): ByteArray? {
     return context.contentResolver.openInputStream(uri)?.use { inputStream ->
@@ -176,6 +176,7 @@ fun uriToByteArray(context: Context, uri: Uri): ByteArray? {
     }
 }
 
+//Función para obtener el logo de arriba de las paginas
 @Composable
 fun logoArriba(){
     Box(

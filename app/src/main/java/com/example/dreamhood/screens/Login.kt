@@ -1,9 +1,6 @@
 package com.example.dreamhood.screens
 
 import android.annotation.SuppressLint
-import android.os.Build
-import android.util.Log
-import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -41,13 +38,8 @@ import androidx.navigation.NavController
 import com.example.dreamhood.R
 import com.example.dreamhood.navegacion.AppScreens
 import com.example.dreamhood.navegacion.SessionManager
-import java.sql.DriverManager
 import java.sql.PreparedStatement
-import java.sql.ResultSet
 import java.sql.SQLException
-import java.sql.Types
-
-
 
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
@@ -57,7 +49,7 @@ fun primeraPantlla(navController: NavController){
             login(navController)
     }
 }
-
+//Función que contiene todo el apartado de diseño de la pagina.
 @Composable
 fun login(navController: NavController){
 
@@ -108,6 +100,7 @@ fun login(navController: NavController){
     }
 }
 
+//Función que contiene los botones y la logica de los mismos.
 @Composable
 fun Botones(navController: NavController, email:String,pass:String) {
 
@@ -129,8 +122,6 @@ fun Botones(navController: NavController, email:String,pass:String) {
         )
 
     }
-
-
     Row(
         modifier = Modifier.padding(top = 35.dp),
         horizontalArrangement = Arrangement.spacedBy(35.dp) // Espacio entre los botones
@@ -166,6 +157,7 @@ fun Botones(navController: NavController, email:String,pass:String) {
     }
 }
 
+//Función para iniciar sesión y verificar las credenciales.
 
 fun iniciarSesion(email: String, pass: String): Boolean {
     var contrasennaBD: String? = null
@@ -179,7 +171,6 @@ fun iniciarSesion(email: String, pass: String): Boolean {
             contrasennaBD = resultSet.getString("contrasena")
         }
     } catch (ex: SQLException) {
-        // Manejar la excepción adecuadamente, por ejemplo, registrando o devolviendo false
         ex.printStackTrace()
         return false
     }finally {
@@ -189,6 +180,7 @@ fun iniciarSesion(email: String, pass: String): Boolean {
     return contrasennaBD == pass
 }
 
+//Función para los id de los barrios.
 fun obtenerIDBarrio(correo : String): Int{
     var barrio_id: Int = 0
     val connectSql = ConnectSql()

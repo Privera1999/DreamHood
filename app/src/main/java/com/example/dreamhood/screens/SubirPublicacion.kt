@@ -2,15 +2,8 @@ package com.example.dreamhood.screens
 
 import android.annotation.SuppressLint
 import android.content.Context
-import android.graphics.BitmapFactory
-import android.net.Uri
-import android.text.BoringLayout
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 
 import androidx.compose.foundation.layout.Column
@@ -29,10 +22,10 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.RadioButton
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AddCircle
 import androidx.compose.material.icons.filled.Done
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Warning
+import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -46,19 +39,16 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.asImageBitmap
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.dreamhood.navegacion.AppScreens
 import com.example.dreamhood.navegacion.SessionManager
-import com.google.firebase.messaging.FirebaseMessaging
-import com.google.firebase.messaging.RemoteMessage
-import java.io.ByteArrayOutputStream
-import java.io.InputStream
+import com.google.android.gms.maps.model.CameraPosition
+import com.google.android.gms.maps.model.LatLng
+import com.google.maps.android.compose.GoogleMap
+import com.google.maps.android.compose.rememberCameraPositionState
 import java.sql.PreparedStatement
 import java.sql.SQLException
 
@@ -83,6 +73,9 @@ fun formulariopublicacion(navController: NavController? = null) {
     var descripcion by remember { mutableStateOf("") }
     var votacion by remember { mutableStateOf(false) }
     var foto by remember { mutableStateOf<ByteArray?>(null) }
+    var latitud by remember { mutableStateOf("") }
+    var longitud by remember { mutableStateOf("") }
+    var MapaMostrado by remember { mutableStateOf(false) }
 
 
 
@@ -133,12 +126,29 @@ fun formulariopublicacion(navController: NavController? = null) {
 
         votacion = EsVotacion()
 
+
+
+
+        Button(onClick = { MapaMostrado = true }) {
+            Text("Seleccionar Ubicación")
+        }
+
+        if (MapaMostrado) {
+            MapScreen(
+                onLocationSelected = { lat, lon ->
+                    latitud = lat.toString()
+                    longitud = lon.toString()
+                    MapaMostrado = false
+                }
+            )
+        }
+
         Spacer(modifier = Modifier.height(15.dp))
 
         Row(){
             foto = PhotoPicker(false)
             Spacer(modifier = Modifier.width(20.dp))
-            botonSubir(titulo,descripcion,votacion,foto,navController)
+            botonSubir(titulo,descripcion,votacion,foto,latitud,longitud,navController)
         }
 
         }
@@ -198,6 +208,8 @@ fun botonSubir(
     descripcion: String,
     votacion: Boolean,
     foto: ByteArray?,
+    latitud: String,
+    longitud: String,
     navController: NavController? = null
 ) {
     val context = LocalContext.current
@@ -223,7 +235,7 @@ fun botonSubir(
                             showToast(context, "Error: Debe seleccionar la opción de votación.")
                         }
                         else -> {
-                            insertPublicacion(titulo, descripcion, votacion, foto, context)
+                            insertPublicacion(titulo,descripcion, votacion,foto,latitud,longitud,context)
                             navController?.navigate(AppScreens.feed.route)
                             showToast(context, "Publicación Subida Correctamente.")
                         }
@@ -241,13 +253,13 @@ fun botonSubir(
 }
 
 
-fun insertPublicacion(titulo: String, descripcion: String, es_votacion: Boolean, imagen: ByteArray?, context: Context) {
+fun insertPublicacion(titulo: String, descripcion: String, es_votacion: Boolean, imagen: ByteArray?,latitud: String,longitud: String, context: Context) {
     var connectSql = ConnectSql()
     val (username, password, barrioId) = SessionManager.getSession(context)
     val usuarioid= obtenerIDUsuario(username)
 
     try {
-        val addPublicacion: PreparedStatement = connectSql.dbConn()?.prepareStatement("INSERT INTO incidentes (titulo, descripcion, usuario_id, barrio_id, es_votacion, imagen) VALUES (?,?,?,?,?,?)")!!
+        val addPublicacion: PreparedStatement = connectSql.dbConn()?.prepareStatement("INSERT INTO incidentes (titulo, descripcion, usuario_id, barrio_id, es_votacion, imagen,latitud,longitud) VALUES (?,?,?,?,?,?,?,?)")!!
         addPublicacion.setString(1, titulo)
         addPublicacion.setString(2, descripcion)
         addPublicacion.setInt(3, usuarioid)
@@ -256,6 +268,8 @@ fun insertPublicacion(titulo: String, descripcion: String, es_votacion: Boolean,
         }
         addPublicacion.setBoolean(5, es_votacion)
         addPublicacion.setBytes(6, imagen)
+        addPublicacion.setString(7,latitud)
+        addPublicacion.setString(8,longitud)
         addPublicacion.executeUpdate()
     } catch (ex: Exception) {
         ex.printStackTrace()
@@ -283,6 +297,26 @@ fun obtenerIDUsuario(correo : String?): Int{
     }
     return usuarioId
 
+}
+
+@Composable
+fun MapScreen(onLocationSelected: (Double, Double) -> Unit) {
+    val context = LocalContext.current
+    val Cordoba = LatLng(37.887620, -4.779756)
+    val defaultCameraPosition = CameraPosition.fromLatLngZoom(Cordoba, 11f)
+    val cameraPositionState = rememberCameraPositionState {
+        position = defaultCameraPosition
+    }
+
+    GoogleMap(
+        modifier = Modifier.fillMaxSize(),
+        cameraPositionState = cameraPositionState,
+        onMapClick = { latLng ->
+            onLocationSelected(latLng.latitude, latLng.longitude)
+        }
+    ) {
+
+    }
 }
 
 

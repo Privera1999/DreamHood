@@ -17,6 +17,7 @@ import com.example.dreamhood.screens.feed
 import com.example.dreamhood.screens.primeraPantlla
 import mapas
 
+//Funciones para la correcta navegación de la app medianté la biblioteca NavHost
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable

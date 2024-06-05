@@ -42,14 +42,15 @@ fun Comentarios(navController: NavController, idPublicacion: Int?) {
     }
 }
 
-
+//Data class para hacer listas de Publicaciones
 data class Publicacion(
-    val foto: ByteArray, // Puedes usar cualquier tipo adecuado para la foto
+    val foto: ByteArray,
     val usuarioID: Int,
     val texto: String,
     val titulo: String,
 )
 
+//Funcion Raiz de la pantalla Comentarios
 @Composable
 fun ComentariosScreen(navController: NavController, idPublicacion: Int?, context : Context) {
     var publicacion by remember { mutableStateOf<Publicacion?>(null) }
@@ -120,12 +121,14 @@ fun ComentariosScreen(navController: NavController, idPublicacion: Int?, context
     }
 }
 
+//Data class para los comentarios
 data class Comentario(
     val usuarioID: Int,
     val texto: String,
     val avatar: ByteArray?,
 )
 
+//Muestra por visualmente todo el diseño de la pantalla
 @Composable
 fun ComentarioItem(comentario: Comentario) {
     val nombreUsuario = obtenerNombreUsuario(comentario.usuarioID)
@@ -156,6 +159,7 @@ fun ComentarioItem(comentario: Comentario) {
     }
 }
 
+//Función para obtener desde la base de datos los datos de las publicaciones
 fun obtenerPublicacion(idPublicacion: Int): Publicacion? {
     val connectSql = ConnectSql()
     var publicacion: Publicacion? = null
@@ -182,6 +186,7 @@ fun obtenerPublicacion(idPublicacion: Int): Publicacion? {
     return publicacion
 }
 
+//Función para obtener desde la base de datos los comentarios
 fun obtenerComentarios(idPublicacion: Int): List<Comentario> {
     val comentarios: MutableList<Comentario> = mutableListOf()
     val connectSql = ConnectSql()
@@ -211,6 +216,7 @@ fun obtenerComentarios(idPublicacion: Int): List<Comentario> {
     return comentarios
 }
 
+//Función para añadir a la base de datos los comentarios
 fun añadirComentario(idPublicacion: Int, usuarioID: Int, texto: String) {
     val connectSql = ConnectSql()
     try {
@@ -227,7 +233,7 @@ fun añadirComentario(idPublicacion: Int, usuarioID: Int, texto: String) {
         connectSql.close()
     }
 }
-
+//Función para obtener el nombre del usuario mediante el id
 fun obtenerNombreUsuario(idUsuario: Int): String {
     var nombreUsuario: String = ""
     val connectSql = ConnectSql()
@@ -248,6 +254,7 @@ fun obtenerNombreUsuario(idUsuario: Int): String {
     return nombreUsuario
 }
 
+//Función para obtener el id del usuario mediante su correo
 fun obtenerIdUsuario(correo: String): Int {
     var idUsuario = 0
     val connectSql = ConnectSql()

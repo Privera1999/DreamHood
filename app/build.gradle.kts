@@ -82,6 +82,11 @@ dependencies {
     implementation("com.google.firebase:firebase-messaging-ktx")
     implementation ("com.google.android.gms:play-services-maps:18.0.2")
     implementation ("com.google.maps.android:maps-compose:2.2.0")
+    testImplementation ("junit:junit:4.13.2")
+    testImplementation ("io.mockk:mockk:1.12.0")
+    testImplementation ("androidx.compose.ui:ui-test-junit4:1.0.5")
+    testImplementation ("org.mockito:mockito-core:3.11.2")
+    testImplementation ("org.mockito:mockito-inline:3.11.2")
 
 
 

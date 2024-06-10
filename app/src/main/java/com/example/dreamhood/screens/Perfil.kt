@@ -56,6 +56,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.modifier.modifierLocalConsumer
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
@@ -135,7 +136,8 @@ fun formularioPerfil(navController: NavController) {
                 keyboardType = KeyboardType.Password
             ),
             label = { Text("Nueva Contraseña") },
-            leadingIcon = { Icon(Icons.Filled.Lock, contentDescription = null) }
+            leadingIcon = { Icon(Icons.Filled.Lock, contentDescription = null) },
+            visualTransformation = PasswordVisualTransformation()
         )
 
         Spacer(modifier = Modifier.height(15.dp))
@@ -147,7 +149,8 @@ fun formularioPerfil(navController: NavController) {
                 keyboardType = KeyboardType.Password
             ),
             label = { Text("Confirmar Nueva Contraseña") },
-            leadingIcon = { Icon(Icons.Filled.Lock, contentDescription = null) }
+            leadingIcon = { Icon(Icons.Filled.Lock, contentDescription = null) },
+            visualTransformation = PasswordVisualTransformation()
         )
 
         Spacer(modifier = Modifier.height(15.dp))
